@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    // Admins are listed by hand in the `admins` collection (document id = user uid).
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /admins/{uid} {
+      allow get: if isOwner(uid);   // lets the app check "am I an admin?"
+      allow list, write: if false;  // manage admins in the Firebase console only
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create, update: if isOwner(uid);
+      allow delete: if false;
+    }
+
+    match /categories/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /records/{id} {
+      allow read: if signedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+
+      allow create: if isOwner(request.resource.data.userId)
+        && request.resource.data.status == 'PENDING'
+        && request.resource.data.isDeleted == false
+        && request.resource.data.verifiedBy == null
+        && request.resource.data.amount is int
+        && request.resource.data.amount > 0;
+
+      // Owner edits: verified records only allow note/proof changes and can't be deleted.
+      // A rejected record may go back to PENDING (resubmit). Members can never set VERIFIED/REJECTED.
+      function ownerEdit() {
+        let changed = request.resource.data.diff(resource.data).affectedKeys();
+        return resource.data.status == 'VERIFIED'
+          ? changed.hasOnly(['note', 'proofUrl', 'updatedAt'])
+          : changed.hasOnly(['categoryId', 'categoryName', 'amount', 'date', 'monthKey', 'method',
+                             'note', 'proofUrl', 'updatedAt', 'isDeleted', 'status'])
+            && (!changed.hasAny(['status'])
+                || (resource.data.status == 'REJECTED' && request.resource.data.status == 'PENDING'));
+      }
+
+      // Admin review: only the review fields can change.
+      function adminReview() {
+        let changed = request.resource.data.diff(resource.data).affectedKeys();
+        return changed.hasOnly(['status', 'verifiedBy', 'verifiedByName', 'verifiedAt', 'reviewNote', 'updatedAt'])
+          && request.resource.data.status in ['PENDING', 'VERIFIED', 'REJECTED'];
+      }
+
+      allow update: if signedIn() && (
+        (isOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId && ownerEdit())
+        || (isAdmin() && adminReview())
+      );
+      allow delete: if false; // records are soft-deleted (isDeleted = true)
+    }
+
+    match /targets/{id} {
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isOwner(request.resource.data.userId);
+      allow update: if isOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isOwner(resource.data.userId);
+    }
+  }
+}
