@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, Alert, Platform, KeyboardAvoidingView } from 'react-native';
+import { goBack } from '../src/lib/nav';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addDoc, updateDoc, deleteDoc, doc, collection, serverTimestamp, Timestamp } from 'firebase/firestore';
@@ -58,20 +59,20 @@ export default function TargetForm() {
     const fail = (err: any) => Alert.alert('Could not save target', err.message);
     if (editing) updateDoc(doc(db, 'targets', editing.id), data).catch(fail);
     else addDoc(collection(db, 'targets'), { ...data, userId: user.uid, createdAt: serverTimestamp() }).catch(fail);
-    router.back();
+    goBack(router);
   }
 
   const remove = () =>
     Alert.alert('Delete target?', 'Your records are not affected.', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => { deleteDoc(doc(db, 'targets', editing!.id)).catch(() => {}); router.back(); } },
+      { text: 'Delete', style: 'destructive', onPress: () => { deleteDoc(doc(db, 'targets', editing!.id)).catch(() => {}); goBack(router); } },
     ]);
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={s.wrap} keyboardShouldPersistTaps="handled">
         <View style={s.top}>
-          <Pressable onPress={() => router.back()} hitSlop={12}><Text style={s.close}>Cancel</Text></Pressable>
+          <Pressable onPress={() => goBack(router)} hitSlop={12}><Text style={s.close}>Cancel</Text></Pressable>
           <Text style={s.title}>{editing ? 'Edit target' : 'New target'}</Text>
           <View style={{ width: 50 }} />
         </View>

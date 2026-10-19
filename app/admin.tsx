@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Pressable, Image, Modal, TextInput, StyleSheet, Alert } from 'react-native';
+import { goBack } from '../src/lib/nav';
 import { useRouter } from 'expo-router';
 import { collection, doc, getDoc, onSnapshot, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { format } from 'date-fns';
@@ -58,7 +59,7 @@ export default function Admin() {
 
   const Header = (
     <View>
-      <Pressable onPress={() => router.back()} hitSlop={12}><Text style={s.back}>‹ Back</Text></Pressable>
+      <Pressable onPress={() => goBack(router)} hitSlop={12}><Text style={s.back}>‹ Back</Text></Pressable>
       <Text style={s.title}>Verify records</Text>
     </View>
   );

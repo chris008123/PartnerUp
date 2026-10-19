@@ -16,7 +16,8 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.xris0081.partnerup"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -26,6 +27,12 @@
       "expo-secure-store",
       "@react-native-community/datetimepicker"
     ],
-    "scheme": "partnerup"
+    "scheme": "partnerup",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "30076842-ffb0-4f1d-981f-a30a26f90eb4"
+      }
+    }
   }
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Image, Pressable, Modal, StyleSheet, Alert } from 'react-native';
+import { goBack } from '../../src/lib/nav';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { format } from 'date-fns';
@@ -21,7 +22,7 @@ export default function RecordDetail() {
     return (
       <View style={[s.wrap, { alignItems: 'center', justifyContent: 'center' }]}>
         <Text style={{ color: colors.muted, marginBottom: 16 }}>This record is no longer available.</Text>
-        <View style={{ width: 160 }}><Button title="Go back" onPress={() => router.back()} /></View>
+        <View style={{ width: 160 }}><Button title="Go back" onPress={() => goBack(router)} /></View>
       </View>
     );
   }
@@ -35,7 +36,7 @@ export default function RecordDetail() {
         onPress: () => {
           updateDoc(doc(db, 'records', r.id), { isDeleted: true, updatedAt: serverTimestamp() })
             .catch((e) => Alert.alert('Could not delete', e.message));
-          router.back();
+          goBack(router);
         },
       },
     ]);
@@ -52,7 +53,7 @@ export default function RecordDetail() {
   return (
     <View style={s.wrap}>
       <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 64, paddingBottom: 40 }}>
-        <Pressable onPress={() => router.back()} hitSlop={12}><Text style={s.back}>‹ Back</Text></Pressable>
+        <Pressable onPress={() => goBack(router)} hitSlop={12}><Text style={s.back}>‹ Back</Text></Pressable>
         <Text style={s.title}>Record detail</Text>
 
         {r.proofUrl ? (

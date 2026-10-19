@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, Image, TextInput, StyleSheet, Alert, Platform, KeyboardAvoidingView } from 'react-native';
+import { goBack } from '../src/lib/nav';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
@@ -93,7 +94,7 @@ export default function AddRecord() {
           createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
         }).catch(fail);
       }
-      router.back();
+      goBack(router);
     } catch (err: any) {
       Alert.alert('Could not save record', err?.message ?? 'Please try again.');
       setSaving(false);
@@ -105,7 +106,7 @@ export default function AddRecord() {
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={s.wrap} keyboardShouldPersistTaps="handled">
         <View style={s.top}>
-          <Pressable onPress={() => router.back()} hitSlop={12}><Text style={s.close}>Cancel</Text></Pressable>
+          <Pressable onPress={() => goBack(router)} hitSlop={12}><Text style={s.close}>Cancel</Text></Pressable>
           <Text style={s.title}>{editing ? 'Edit record' : 'Add record'}</Text>
           <View style={{ width: 50 }} />
         </View>
