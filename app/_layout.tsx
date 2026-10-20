@@ -32,9 +32,15 @@ function Gate() {
   useEffect(() => {
     if (loading) return;
     const inAuth = segments[0] === '(auth)';
-    if (!user && !inAuth) router.replace('/(auth)/sign-in');
-    else if (user && inAuth) router.replace('/(tabs)');
-  }, [user, loading, segments]);
+    const inVerify = segments[0] === 'verify-email';
+    if (!user) {
+      if (!inAuth) router.replace('/(auth)/sign-in');
+    } else if (!user.emailVerified) {
+      if (!inVerify) router.replace('/verify-email');
+    } else if (inAuth || inVerify) {
+      router.replace('/(tabs)');
+    }
+  }, [user, user?.emailVerified, loading, segments]);
 
   return (
     <View style={{ flex: 1 }}>

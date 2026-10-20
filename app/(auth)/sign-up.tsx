@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, StyleSheet, Alert } from 'react-native';
 import { Link } from 'expo-router';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../../src/lib/firebase';
 import { authMessage } from '../../src/lib/errors';
@@ -27,6 +27,7 @@ export default function SignUp() {
     try {
       const cred = await createUserWithEmailAndPassword(auth, f.email.trim(), f.password);
       await updateProfile(cred.user, { displayName: f.name.trim() });
+      sendEmailVerification(cred.user).catch(() => {}); // member can resend from the verify screen
       await setDoc(doc(db, 'users', cred.user.uid), {
         name: f.name.trim(),
         email: f.email.trim().toLowerCase(),

@@ -3,7 +3,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
 
 export const slug = (n: string) => n.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-const DEFAULTS = ['Building Project', 'Ministry Programs', 'Tithe', 'Welfare', 'Other'].map((n) => ({ id: slug(n), name: n }));
+const DEFAULTS = ['Rhapsody Partnership', 'Healing Streams Partnership', 'Venue Partnership'].map((n) => ({ id: slug(n), name: n }));
 
 export function useCategories() {
   const [cats, setCats] = useState(DEFAULTS);
