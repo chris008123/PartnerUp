@@ -5,6 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 import { View } from 'react-native';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
 import { RecordsProvider } from '../src/context/RecordsContext';
+import { ReminderProvider } from '../src/context/ReminderContext';
 import Splash from '../src/components/Splash';
 import LockScreen from '../src/components/LockScreen';
 
@@ -59,7 +60,9 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <RecordsProvider>
-        <Gate />
+        <ReminderProvider>
+          <Gate />
+        </ReminderProvider>
       </RecordsProvider>
     </AuthProvider>
   );

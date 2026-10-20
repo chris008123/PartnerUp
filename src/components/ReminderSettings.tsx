@@ -4,6 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { useReminder } from '../context/ReminderContext';
 import { DAYS, ensurePermission } from '../lib/reminder';
+import { notificationsAvailable } from '../lib/notifications';
 import Chip from './Chip';
 import { colors } from '../theme';
 
@@ -20,6 +21,14 @@ export default function ReminderSettings() {
 
   const time = new Date();
   time.setHours(settings.hour, settings.minute, 0, 0);
+
+  if (!notificationsAvailable) {
+    return (
+      <Text style={s.help}>
+        Weekly reminders aren't available in Expo Go. They work in the installed Partner Up app once it has been built with notifications.
+      </Text>
+    );
+  }
 
   return (
     <View>

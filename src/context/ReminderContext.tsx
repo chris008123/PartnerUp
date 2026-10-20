@@ -1,20 +1,22 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { AppState } from 'react-native';
-import * as Notifications from 'expo-notifications';
+import { Notifications } from '../lib/notifications';
 import { startOfWeek } from 'date-fns';
 import { useAuth } from './AuthContext';
 import { useRecords } from './RecordsContext';
 import { DEFAULT_REMINDER, ReminderSettings, loadReminder, saveReminder, syncReminders } from '../lib/reminder';
 
 // Show reminders even if the app happens to be open.
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
+try {
+  Notifications?.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
+} catch {}
 
 type Ctx = { settings: ReminderSettings; update: (patch: Partial<ReminderSettings>) => void };
 const ReminderContext = createContext<Ctx>({ settings: DEFAULT_REMINDER, update: () => {} });

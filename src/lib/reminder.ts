@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Notifications from 'expo-notifications';
+import { Notifications } from './notifications';
 import { Platform } from 'react-native';
 import { addWeeks, endOfWeek, startOfWeek } from 'date-fns';
 
@@ -29,6 +29,7 @@ export async function loadReminder(): Promise<ReminderSettings> {
 export const saveReminder = (s: ReminderSettings) => AsyncStorage.setItem(KEY, JSON.stringify(s)).catch(() => {});
 
 export async function ensurePermission(): Promise<boolean> {
+  if (!Notifications) return false;
   let p = await Notifications.getPermissionsAsync();
   if (!p.granted && p.canAskAgain) p = await Notifications.requestPermissionsAsync();
   return p.granted;
@@ -53,6 +54,7 @@ function upcoming(s: ReminderSettings, skipThisWeek: boolean): Date[] {
 }
 
 export async function syncReminders(s: ReminderSettings, hasRecordThisWeek: boolean) {
+  if (!Notifications) return; // not available here (e.g. Expo Go)
   await Notifications.cancelAllScheduledNotificationsAsync();
   if (!s.enabled) return;
   if (!(await Notifications.getPermissionsAsync()).granted) return;
