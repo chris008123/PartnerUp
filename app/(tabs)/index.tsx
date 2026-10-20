@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { startOfWeek } from 'date-fns';
 import { useTargets } from '../../src/lib/useTargets';
-import { useProfile } from '../../src/lib/useProfile';
+import { useReminder } from '../../src/context/ReminderContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { useRecords } from '../../src/context/RecordsContext';
 import { formatGHS } from '../../src/lib/money';
@@ -22,13 +22,13 @@ export default function Home() {
   const { records } = useRecords();
   const router = useRouter();
   const monthly = useTargets().find((t) => t.period === 'monthly');
-  const profile = useProfile();
+  const { settings: reminder } = useReminder();
   const target = monthly ? monthly.amountGoal : null;
 
   const total = monthTotal(records);
   const pct = monthly && target ? Math.min(100, Math.round((targetProgress(monthly, records) / target) * 100)) : null;
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-  const showReminder = profile.weeklyReminder && !records.some((r) => r.date >= weekStart);
+  const showReminder = reminder.enabled && !records.some((r) => r.date >= weekStart);
   const first = (user?.displayName || '').split(' ')[0];
   const streak = weekStreak(records);
 

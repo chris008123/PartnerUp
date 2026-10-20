@@ -10,6 +10,7 @@ import { useAuth } from '../../src/context/AuthContext';
 import { useProfile } from '../../src/lib/useProfile';
 import { useIsAdmin } from '../../src/lib/useIsAdmin';
 import Button from '../../src/components/Button';
+import ReminderSettings from '../../src/components/ReminderSettings';
 import { colors } from '../../src/theme';
 
 const initials = (n?: string | null) => (n || '?').split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
@@ -81,10 +82,7 @@ export default function Profile() {
         <Row title="My targets" onPress={() => router.push('/(tabs)/targets')} />
         {isAdmin && <Row title="Verify records (admin)" onPress={() => router.push('/admin')} />}
         <Row title="Notifications" open={open === 'notif'} onPress={() => toggle('notif')}>
-          <View style={s.switchRow}>
-            <Text style={s.help}>Remind me on Home when I haven't added a record this week</Text>
-            <Switch value={profile.weeklyReminder} onValueChange={(v) => merge({ weeklyReminder: v })} trackColor={{ true: colors.greenMid }} />
-          </View>
+          <ReminderSettings />
         </Row>
         <Row title="Security" open={open === 'sec'} onPress={() => toggle('sec')}>
           <View style={s.switchRow}>
